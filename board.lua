@@ -1,21 +1,34 @@
 require("card")
 require("pile")
+require("player")
 
 Board = {}
 Board.__index = Board
+
+PILE_LOCATIONS = {
+  LEFT = 0,
+  CENTER = 1,
+  RIGHT = 2,
+  HAND = 3,
+  DECK = 4
+}
 
 function Board:new(deck1, deck2)
   local board = {}
   setmetatable(board, Board)
   
-  board.yourDeck = deck1
-  board.oppDeck = deck2
   
-  board.yourHand = {}
-  board.oppHand = {}
+  board.player = Player:new(deck1)
+  board.opp = Player:new(deck2)
+  
+  --board.yourDeck = deck1
+  --board.oppDeck = deck2
+  
+  --board.yourHand = {}
+  --board.oppHand = {}
 
-  board.yourLocations = {}
-  board.oppLocations = {}
+  --board.yourLocations = {}
+  --board.oppLocations = {}
   board.allPiles = {}
 
   local cardWidth, spacing = 80, 10
@@ -30,36 +43,37 @@ function Board:new(deck1, deck2)
   -- Create opponent piles
   for i = 0, 2 do
     local x = horizontalStart + i * (locationWidth + spacing)
-    local pile = Pile:new(x, topY)
-    table.insert(board.oppLocations, pile)
-    table.insert(board.allPiles, pile)
+    local pile = Pile:new(x, topY, PILE_LOCATIONS[i + 1])
+    table.insert(board.opp.locations, pile)
+    table.insert(board.opp.piles, pile)
   end
 
   -- Create your piles
   for i = 0, 2 do
     local x = horizontalStart + i * (locationWidth + spacing)
-    local pile = Pile:new(x, bottomY)
-    table.insert(board.yourLocations, pile)
-    table.insert(board.allPiles, pile)
+    local pile = Pile:new(x, bottomY, PILE_LOCATIONS[i + 1])
+    table.insert(board.player.locations, pile)
+    table.insert(board.player.piles, pile)
   end
   
   local oppHandX = (love.graphics.getWidth() - handWidth) / 2
   local oppHandY = topY - cardHeight - 40
-  board.oppHand = Pile:new(oppHandX, oppHandY)
-  table.insert(board.allPiles, board.oppHand)
+  board.opp.hand = Pile:new(oppHandX, oppHandY, PILE_LOCATIONS.HAND)
+  table.insert(board.opp.piles, board.opp.hand)
 
   -- 🟦 Add your hand pile
   local yourHandX = (love.graphics.getWidth() - handWidth) / 2
   local yourHandY = bottomY + cardHeight + 40
-  board.yourHand = Pile:new(yourHandX, yourHandY)
-  table.insert(board.allPiles, board.yourHand)
+  board.player.hand = Pile:new(yourHandX, yourHandY, PILE_LOCATIONS.HAND)
+  table.insert(board.player.piles, board.player.hand)
   
   -- Deal 3 cards to your hand
   for i = 1, 3 do
-    local card = table.remove(board.yourDeck.cards)
+    local card = table.remove(board.player.deck.cards)
     
     if card then
-      board.yourHand:addCard(card)
+      board.player.hand:addCard(card)
+      card.pileLocation = PILE_LOCATIONS.HAND
     end
 
   end
@@ -70,7 +84,7 @@ end
 
 
 function Board:update(grabber)
-  for _, pile in ipairs(self.allPiles) do
+  for _, pile in ipairs(self.player.piles) do
     for _, card in ipairs(pile.cards) do
       card:checkForMouseOver(grabber)
     end
@@ -91,14 +105,14 @@ function Board:draw()
   local horizontalStart = (love.graphics.getWidth() - ((locationWidth + spacing) * 3 - spacing)) / 2
 
   -- Draw opponent pile outlines
-  for _, pile in ipairs(self.oppLocations) do
+  for _, pile in ipairs(board.opp.locations) do
     love.graphics.setColor(1, 0, 0, 1)
     love.graphics.rectangle("line", pile.position.x, pile.position.y, pile.width, pile.height)
     pile:draw()
   end
 
   -- Draw player pile outlines
-  for _, pile in ipairs(self.yourLocations) do
+  for _, pile in ipairs(board.player.locations) do
     love.graphics.setColor(0, 0, 1, 1)
     love.graphics.rectangle("line", pile.position.x, pile.position.y, pile.width, pile.height)
     pile:draw()
@@ -119,7 +133,11 @@ function Board:draw()
   love.graphics.setColor(1, 1, 1, 1)
 
   -- Draw all piles
-  for _, pile in ipairs(board.allPiles) do
+  for _, pile in ipairs(board.player.piles) do
+    pile:draw()
+  end
+  
+  for _, pile in ipairs(board.opp.piles) do
     pile:draw()
   end
   

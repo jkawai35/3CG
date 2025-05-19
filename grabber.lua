@@ -1,5 +1,6 @@
 require("vector")
 require("board")
+require("player")
 
 GrabberClass = {}
 io.stdout:setvbuf("no")
@@ -32,7 +33,7 @@ end
 function GrabberClass:mousepressed(x, y, board)
   self.grabPos = Vector(x, y)
 
-  for _, pile in ipairs(board.allPiles) do
+  for _, pile in ipairs(board.player.piles) do
     for _, card in ipairs(pile.cards) do
       if card.state == CARD_STATE.MOUSE_OVER then
         self.heldObject = card
@@ -62,10 +63,11 @@ function GrabberClass:mousereleased(x, y, board)
   if not self.heldObject then return end
 
   local snapped = false
-  for _, pile in ipairs(board.allPiles) do
+  for _, pile in ipairs(board.player.piles) do
     if pile:contains(x, y) then
       if pile:addCard(self.heldObject) then
         snapped = true
+        self.heldObject.pileLocation = pile.location
         break
       end
     end

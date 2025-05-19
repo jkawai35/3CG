@@ -3,7 +3,7 @@ require("card")
 Pile = {}
 Pile.__index = Pile  -- If you meant to use Pile here, fix this line to: Pile.__index = Pile
 
-function Pile:new(x, y)
+function Pile:new(x, y, location)
   local pile = {}
   setmetatable(pile, Pile)
 
@@ -11,6 +11,7 @@ function Pile:new(x, y)
   pile.position = { x = x or 0, y = y or 0 }
   pile.width = (80 + 10) * 4 - 10 -- assuming 4 cards max with 10px spacing
   pile.height = 115
+  pile.location = location
 
   return pile
 end
