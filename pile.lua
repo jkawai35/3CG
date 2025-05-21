@@ -3,15 +3,16 @@ require("card")
 Pile = {}
 Pile.__index = Pile  -- If you meant to use Pile here, fix this line to: Pile.__index = Pile
 
-function Pile:new(x, y, location)
+function Pile:new(x, y, location, board)
   local pile = {}
   setmetatable(pile, Pile)
 
   pile.cards = {}
-  pile.position = { x = x or 0, y = y or 0 }
+  pile.position = Vector(x or 0, y or 0)
   pile.width = (80 + 10) * 4 - 10 -- assuming 4 cards max with 10px spacing
   pile.height = 115
   pile.location = location
+  pile.board = board
 
   return pile
 end
@@ -29,10 +30,16 @@ function Pile:length()
   return #self.cards
 end
 
-function Pile:reveal()
+function Pile:reveal(board)
   local totalPower = 0
   for _, card in ipairs(self.cards) do
     totalPower = totalPower + card.power
+    
+    if card.ability then
+      card:ability(board)
+    end
+    
+    card.canMove = false
   end
   return totalPower
 end
@@ -48,12 +55,8 @@ function Pile:contains(x, y)
 end
 
 function Pile:addCard(card)
-  if #self.cards >= 4 then
-    return false -- pile full
-  end
-
   -- Remove from previous pile if any
-  if card.currentPile then
+  if card.currentPile and card.currentPile ~= self then
     card.currentPile:removeCard(card)
   end
 
@@ -62,7 +65,7 @@ function Pile:addCard(card)
   card.position = Vector(self:getCardPosition(#self.cards))
   card.currentPile = self -- 🔹 Set this as the current pile
   card.prevPile = self
-  
+
   return true
 end
 

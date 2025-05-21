@@ -14,6 +14,7 @@ function Player:new(deck)
   player.deck = deck
   player.locations = {}
   player.piles = {}
+  player.score = 0
   
   
   return player

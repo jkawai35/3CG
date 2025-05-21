@@ -1,6 +1,7 @@
 require("deck")
 require("board")
 require("grabber")
+require("gamemanager")
 
 function love.load()
   love.window.setTitle("3CG")
@@ -12,6 +13,8 @@ function love.load()
   deck2:shuffle()
   
   board = Board:new(deck1, deck2)
+  
+  gameManager = GameManager:new(board)
   
   grabber = GrabberClass:new()
 
@@ -30,7 +33,7 @@ end
 
 function love.mousepressed(x, y, button)
   if button == 1 then
-    grabber:mousepressed(x, y, board)
+    board:mousepressed(x, y, button, gameManager, grabber)
   end
 end
 
@@ -44,15 +47,3 @@ function love.mousereleased(x, y, button)
     grabber:mousereleased(x, y, board)
   end
 end
-
-
-function checkForMouseMoving()
-  if grabber.currentMousePos == nil then
-    return
-  end
-  
-  for _, card in ipairs(cardTable) do
-    card:checkForMouseOver(grabber)
-  end
-end
-  

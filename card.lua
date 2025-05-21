@@ -27,6 +27,7 @@ function CardPrototype:new(name, text, pow, cost, front)
   card.currentPile = nil
   card.prevPile = nil
   card.pileLocation = nil
+  card.canMove = true
   
   return card
 end
@@ -55,13 +56,19 @@ function CardPrototype:checkForMouseOver(grabber)
   end
     
   local mousePos = grabber.currentMousePos
+
   local isMouseOver = 
     mousePos.x > self.position.x and
     mousePos.x < self.position.x + 70 and
     mousePos.y > self.position.y and
     mousePos.y < self.position.y + 105
   
-  self.state = isMouseOver and CARD_STATE.MOUSE_OVER or CARD_STATE.IDLE
+  if isMouseOver then
+    self.state = CARD_STATE.MOUSE_OVER
+  else
+    self.state = CARD_STATE.IDLE
+  end
+
 end
 
 

@@ -1,6 +1,7 @@
 require("card")
 require("pile")
 require("player")
+require("vector")
 
 Board = {}
 Board.__index = Board
@@ -21,15 +22,17 @@ function Board:new(deck1, deck2)
   board.player = Player:new(deck1)
   board.opp = Player:new(deck2)
   
-  --board.yourDeck = deck1
-  --board.oppDeck = deck2
-  
-  --board.yourHand = {}
-  --board.oppHand = {}
-
-  --board.yourLocations = {}
-  --board.oppLocations = {}
   board.allPiles = {}
+  
+  board.submitButton = {
+  position = Vector(love.graphics.getWidth() / 2 - 100, love.graphics.getHeight() / 2 - 20),
+  width = 200,
+  height = 50,
+  text = "Submit Play",
+  visible = true
+  }
+
+
 
   local cardWidth, spacing = 80, 10
   local locationWidth = (cardWidth + spacing) * 4 - spacing
@@ -43,7 +46,7 @@ function Board:new(deck1, deck2)
   -- Create opponent piles
   for i = 0, 2 do
     local x = horizontalStart + i * (locationWidth + spacing)
-    local pile = Pile:new(x, topY, PILE_LOCATIONS[i + 1])
+    local pile = Pile:new(x, topY, PILE_LOCATIONS[i + 1], self)
     table.insert(board.opp.locations, pile)
     table.insert(board.opp.piles, pile)
   end
@@ -51,20 +54,20 @@ function Board:new(deck1, deck2)
   -- Create your piles
   for i = 0, 2 do
     local x = horizontalStart + i * (locationWidth + spacing)
-    local pile = Pile:new(x, bottomY, PILE_LOCATIONS[i + 1])
+    local pile = Pile:new(x, bottomY, PILE_LOCATIONS[i + 1], self)
     table.insert(board.player.locations, pile)
     table.insert(board.player.piles, pile)
   end
   
   local oppHandX = (love.graphics.getWidth() - handWidth) / 2
   local oppHandY = topY - cardHeight - 40
-  board.opp.hand = Pile:new(oppHandX, oppHandY, PILE_LOCATIONS.HAND)
+  board.opp.hand = Pile:new(oppHandX, oppHandY, PILE_LOCATIONS.HAND, self)
   table.insert(board.opp.piles, board.opp.hand)
 
   -- 🟦 Add your hand pile
   local yourHandX = (love.graphics.getWidth() - handWidth) / 2
   local yourHandY = bottomY + cardHeight + 40
-  board.player.hand = Pile:new(yourHandX, yourHandY, PILE_LOCATIONS.HAND)
+  board.player.hand = Pile:new(yourHandX, yourHandY, PILE_LOCATIONS.HAND, self)
   table.insert(board.player.piles, board.player.hand)
   
   -- Deal 3 cards to your hand
@@ -131,6 +134,18 @@ function Board:draw()
 
   -- Reset color
   love.graphics.setColor(1, 1, 1, 1)
+  
+  if self.submitButton.visible then
+    love.graphics.setColor(0.2, 0.6, 1)
+    love.graphics.rectangle("fill", self.submitButton.position.x, self.submitButton.position.y,
+                                     self.submitButton.width, self.submitButton.height)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf(self.submitButton.text,
+                         self.submitButton.position.x,
+                         self.submitButton.position.y + 15,
+                         self.submitButton.width,
+                         "center")
+  end
 
   -- Draw all piles
   for _, pile in ipairs(board.player.piles) do
@@ -144,5 +159,18 @@ function Board:draw()
   if grabber.heldObject then
     grabber.heldObject:draw(grabber.heldObject.position.x, grabber.heldObject.position.y)
   end
+end
+
+function Board:mousepressed(x, y, button, gameManager, grabber)
+  -- First check if the submit button was clicked
+  
+  local b = self.submitButton
+  if b.visible and button == 1 and x > b.position.x and x < b.position.x + b.width and y > b.position.y and y < b.position.y + b.height then
+    gameManager:submitPlay()
+    return
+  end
+
+  -- Otherwise forward to grabber logic
+  grabber:mousepressed(x, y, self)
 end
 

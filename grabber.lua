@@ -35,9 +35,10 @@ function GrabberClass:mousepressed(x, y, board)
 
   for _, pile in ipairs(board.player.piles) do
     for _, card in ipairs(pile.cards) do
-      if card.state == CARD_STATE.MOUSE_OVER then
+      if card.state == CARD_STATE.MOUSE_OVER and card.canMove then
         self.heldObject = card
         card.prevPosition = Vector(card.position.x, card.position.y)
+        card.prevPile = card.currentPile
         self.dragOffsetX = x - card.position.x
         self.dragOffsetY = y - card.position.y
         card.state = CARD_STATE.GRABBED
@@ -64,7 +65,7 @@ function GrabberClass:mousereleased(x, y, board)
 
   local snapped = false
   for _, pile in ipairs(board.player.piles) do
-    if pile:contains(x, y) then
+    if pile:contains(x, y) and pile:length() <= 4 then
       if pile:addCard(self.heldObject) then
         snapped = true
         self.heldObject.pileLocation = pile.location
