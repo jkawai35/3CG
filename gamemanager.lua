@@ -1,5 +1,10 @@
+require("player")
+
 GameManager = {}
 GameManager.__index = GameManager
+
+io.stdout:setvbuf("no")
+
 
 GAME_PHASE = {
   STAGING = "STAGING",
@@ -15,6 +20,8 @@ function GameManager:new(board)
 end
 
 function GameManager:submitPlay()
+  self.board.opp:takeTurn(self.board)
+  
   self.phase = GAME_PHASE.REVEAL
   
   local playerAddScore = 0
@@ -40,16 +47,9 @@ function GameManager:submitPlay()
   self.board.player.score = self.board.player.score + playerAddScore
   self.board.opp.score = self.board.opp.score + oppAddScore
   
-  --print(self.board.player.score)
-  
-  local card = table.remove(self.board.player.deck.cards)
-
+  self.board:deal(self.board.player)
+  self.board:deal(self.board.opp)
     
-  if card and #self.board.player.hand.cards <= 6 then
-    self.board.player.hand:addCard(card)
-    card.pileLocation = PILE_LOCATIONS.HAND
-  end
-  self.phase = GAME_PHASE.RESOLUTION
-  
-  print(#self.board.player.hand.cards)
 end
+
+

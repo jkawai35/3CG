@@ -72,13 +72,8 @@ function Board:new(deck1, deck2)
   
   -- Deal 3 cards to your hand
   for i = 1, 3 do
-    local card = table.remove(board.player.deck.cards)
-    
-    if card then
-      board.player.hand:addCard(card)
-      card.pileLocation = PILE_LOCATIONS.HAND
-    end
-
+    board:deal(board.player)
+    board:deal(board.opp)
   end
 
 
@@ -174,3 +169,11 @@ function Board:mousepressed(x, y, button, gameManager, grabber)
   grabber:mousepressed(x, y, self)
 end
 
+function Board:deal(player)
+  local card = table.remove(player.deck.cards)
+    
+  if card and #player.hand.cards <= 6 then
+    player.hand:addCard(card)
+    card.pileLocation = PILE_LOCATIONS.HAND
+  end
+end

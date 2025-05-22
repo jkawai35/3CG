@@ -20,7 +20,13 @@ function Deck:new()
   deck:addCard(AresPrototype:new())
   deck:addCard(ArtemisPrototype:new())
   deck:addCard(HeraPrototype:new())
-  
+  deck:addCard(DemeterPrototype:new())
+  deck:addCard(HadesPrototype:new())
+  deck:addCard(HerculesPrototype:new())
+  deck:addCard(DionysusPrototype:new())
+  deck:addCard(ApolloPrototype:new())
+  deck:addCard(HephaestusPrototype:new())
+
   return deck
 end
 
@@ -36,4 +42,3 @@ end
 function Deck:addCard(card)
   table.insert(self.cards, card)
 end
-

@@ -35,7 +35,7 @@ function Pile:reveal(board)
   for _, card in ipairs(self.cards) do
     totalPower = totalPower + card.power
     
-    if card.ability then
+    if card.hasAbility then
       card:ability(board)
     end
     
@@ -92,7 +92,7 @@ function Pile:getCardPosition(index)
 end
 
 function Pile:changePilePower(amount)
-  for _, card in self.cards do
+  for _, card in ipairs(self.cards) do
     card:changePower(amount)
   end
 end

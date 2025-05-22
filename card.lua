@@ -10,7 +10,7 @@ CARD_STATE = {
 
 -- Constructor for basic card prototype
 -- TODO: Add text parameter
-function CardPrototype:new(name, text, pow, cost, front)
+function CardPrototype:new(name, text, pow, cost, front, ability)
   local card = {}
   local metadata = {__index = CardPrototype}
   setmetatable(card, metadata)
@@ -28,6 +28,7 @@ function CardPrototype:new(name, text, pow, cost, front)
   card.prevPile = nil
   card.pileLocation = nil
   card.canMove = true
+  card.hasAbility = ability
   
   return card
 end
@@ -47,7 +48,7 @@ function CardPrototype:flip()
 end
 
 function CardPrototype:changePower(amount)
-  card.power = card.power + amount
+  self.power = self.power + amount
 end
 
 function CardPrototype:checkForMouseOver(grabber)
@@ -74,117 +75,260 @@ end
 
 -- CARD DEFINITIONS --
 -- 70 x 105 --
-WoodenCowPrototype = CardPrototype:new(
-  "Wooden Cow",
-  "It's a cow made of wood",
-  1,
-  1,
-  love.graphics.newImage("assets/WoodenCow.png")
-)
+WoodenCowPrototype = {} 
 
 function WoodenCowPrototype:new()
-  return WoodenCowPrototype
+  local card = CardPrototype:new(
+    "Wooden Cow",
+    "It's a cow made of wood",
+    1,
+    1,
+    love.graphics.newImage("assets/WoodenCow.png")
+  )
+    
+  return card
 end
 
-PegasusPrototype = CardPrototype:new(
-  "Pegasus",
-  "Faster than you think",
-  3,
-  5,
-  love.graphics.newImage("assets/Pegasus.png")
-)
+PegasusPrototype = {}
 
 function PegasusPrototype:new()
-  return PegasusPrototype
+  local card = CardPrototype:new(
+    "Pegasus",
+    "Faster than you think",
+    3,
+    5,
+    love.graphics.newImage("assets/Pegasus.png"),
+    false
+  )
+  
+  return card
 end
 
-MinotaurPrototype = CardPrototype:new(
-  "Minataur",
-  "Don't mess with a minotaur",
-  5,
-  9,
-  love.graphics.newImage("assets/Minotaur.png")
-)
+MinotaurPrototype = {}
 
 function MinotaurPrototype:new()
-  return MinotaurPrototype
+  local card = CardPrototype:new(
+    "Minataur",
+    "Don't mess with a minotaur",
+    5,
+    9,
+    love.graphics.newImage("assets/Minotaur.png"),
+    false
+  )
+  
+  return card
 end
 
-TitanPrototype = CardPrototype:new(
-  "Titan",
-  "A fierce warrior indeed",
-  6,
-  12,
-  love.graphics.newImage("assets/Titan.png")
-)
+
+
+TitanPrototype = {}
 
 function TitanPrototype:new()
-  return TitanPrototype
+  local card = CardPrototype:new(
+    "Titan",
+    "A fierce warrior indeed",
+    6,
+    12,
+    love.graphics.newImage("assets/Titan.png"),
+    false
+  )
+  
+  return card
 end
 
-ZeusPrototype = CardPrototype:new(
-  "Zeus",
-  "When revealed: Lower the power of each card in your opponenet's hand by 1",
-  12,
-  25,
-  love.graphics.newImage("assets/Zeus.png")
-)
+ZeusPrototype = {}
 
 function ZeusPrototype:new()
-  function ZeusPrototype:ability(board)
-    board.oppHand:changePilePower(-1)
-  end
+  local card = CardPrototype:new(
+    "Zeus",
+    "When revealed: Lower the power of each card in your opponenet's hand by 1",
+    12,
+    25,
+    love.graphics.newImage("assets/Zeus.png"),
+    true
+  )
   
-  return ZeusPrototype
+  function card:ability(board)
+    board.opp.hand:changePilePower(-1)
+  end
+    
+  return card
 end
 
-AresPrototype = CardPrototype:new(
-  "Ares",
-  "When Revealed: Gain +2 power for each enemy card here",
-  9,
-  14,
-  love.graphics.newImage("assets/Ares.png")
-)
+AresPrototype = {}
 
 function AresPrototype:new()
-  function AresPrototype:ability(board)
+  local card = CardPrototype:new(
+    "Ares",
+    "When Revealed: Gain +2 power for each enemy card here",
+    9,
+    14,
+    love.graphics.newImage("assets/Ares.png"),
+    true
+  )
+  
+  function card:ability(board)
     local pile = board.oppLocations[self.pileLocation]
     self.power = self.power + (2 * pile:length())
   end
-  
-  return AresPrototype
+    
+  return card
 end
 
-ArtemisPrototype = CardPrototype:new(
-  "Artemis",
-  "When Revealed: Gain +5 power if there is exactly one enemy card here",
-  8,
-  12,
-  love.graphics.newImage("assets/Artemis.png")
-)
+ArtemisPrototype = {}
 
 function ArtemisPrototype:new()
-  function ArtemisPrototype:ability(board)
+  local card = CardPrototype:new(
+    "Artemis",
+    "When Revealed: Gain +5 power if there is exactly one enemy card here",
+    8,
+    12,
+    love.graphics.newImage("assets/Artemis.png"),
+    true
+  )
+
+  function card:ability(board)
     if board.oppLocations[self.pileLocation]:length() == 1 then
       self.power = self.power + 5
     end
   end
-  
-  return ArtemisPrototype
+    
+  return card
 end
 
-HeraPrototype = CardPrototype:new(
-  "Hera",
-  "When Revealed: Give cards in your hand +1 power",
-  9,
-  16,
-  love.graphics.newImage("assets/Hera.png")
-)
+HeraPrototype = {}
 
 function HeraPrototype:new()
-  function HeraPrototype:ability(board)
+  local card = CardPrototype:new(
+    "Hera",
+    "When Revealed: Give cards in your hand +1 power",
+    9,
+    16,
+    love.graphics.newImage("assets/Hera.png"),
+    true
+  )
+
+  function card:ability(board)
     board.yourHand:changePilePower(1)
   end
-  
-  return HeraPrototype
+    
+  return card
 end
+
+DemeterPrototype = {}
+
+function DemeterPrototype:new()
+  local card = CardPrototype:new(
+    "Demeter",
+    "When Revealed: Both players draw a card",
+    5,
+    14,
+    love.graphics.newImage("assets/Demeter.png"),
+    true
+  )
+  
+  function card:ability(board)
+    print("here")
+    board:deal(board.player)
+    board:deal(board.opp)
+  end
+    
+  return card
+end
+
+HadesPrototype = {}
+
+function HadesPrototype:new()
+  local card = CardPrototype:new(
+    "Hades",
+    "When Revealed: Gain +2 power for each card in your discard pile",
+    9,
+    12,
+    love.graphics.newImage("assets/Hades.png"),
+    true
+  )
+  
+  function card:ability(board)
+    board.yourHand:changePilePower(1)
+  end
+    
+  return card
+end
+
+HerculesPrototype = {}
+
+function HerculesPrototype:new()
+  local card = CardPrototype:new(
+    "Hercules",
+    "When Revealed: Doubles its power if its the strongest card here",
+    10,
+    12,
+    love.graphics.newImage("assets/Hercules.png"),
+    true
+  )
+  
+  function card:ability(board)
+    board.yourHand:changePilePower(1)
+  end
+    
+  return card
+end
+
+DionysusPrototype = {}
+
+function DionysusPrototype:new()
+  local card = CardPrototype:new(
+    "Dionysus",
+    "When Revealed: Gain +2 power for each of your other cards here.",
+    8,
+    14,
+    love.graphics.newImage("assets/Dionysus.png"),
+    true
+  )
+
+  function card:ability(board)
+    board.yourHand:changePilePower(1)
+  end
+    
+  return card
+end
+
+ApolloPrototype = {}
+
+function ApolloPrototype:new()
+  local card = CardPrototype:new(
+    "Apollo",
+    "When Revealed: Gain +1 mana next turn",
+    7,
+    14,
+    love.graphics.newImage("assets/Apollo.png"),
+    true
+  )
+
+  function card:ability(board)
+    board.yourHand:changePilePower(1)
+  end
+    
+  return card
+end
+
+
+HephaestusPrototype = {}
+
+function HephaestusPrototype:new()
+  local card = CardPrototype:new(
+    "Hephaestus",
+    "When Revealed: Lower the cost of 2 cards in your hand by 1",
+    5,
+    12,
+    love.graphics.newImage("assets/Hephaestus.png"),
+    true
+  )
+  
+  function card:ability(board)
+    board.yourHand:changePilePower(1)
+  end
+    
+  return card
+end
+
