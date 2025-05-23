@@ -10,7 +10,7 @@ CARD_STATE = {
 
 -- Constructor for basic card prototype
 -- TODO: Add text parameter
-function CardPrototype:new(name, text, pow, cost, front, ability)
+function CardPrototype:new(name, text, cost, pow, front, ability)
   local card = {}
   local metadata = {__index = CardPrototype}
   setmetatable(card, metadata)
@@ -20,6 +20,7 @@ function CardPrototype:new(name, text, pow, cost, front, ability)
   card.power = pow
   card.cost = cost
   card.frontImage = front
+  card.backImage = love.graphics.newImage("assets/Back.png")
   card.faceUp = true
   card.position = Vector(0, 0)
   card.state = CARD_STATE.IDLE
@@ -38,6 +39,7 @@ function CardPrototype:draw(x,y)
   if self.faceUp then
     love.graphics.draw(self.frontImage, x, y)
   else
+    love.graphics.draw(self.backImage, x, y)
     return
   end
 end
@@ -168,7 +170,7 @@ function AresPrototype:new()
   )
   
   function card:ability(board)
-    local pile = board.oppLocations[self.pileLocation]
+    local pile = board.opp.locations[self.pileLocation]
     self.power = self.power + (2 * pile:length())
   end
     
@@ -188,7 +190,7 @@ function ArtemisPrototype:new()
   )
 
   function card:ability(board)
-    if board.oppLocations[self.pileLocation]:length() == 1 then
+    if board.opp.locations[self.pileLocation]:length() == 1 then
       self.power = self.power + 5
     end
   end
@@ -209,7 +211,7 @@ function HeraPrototype:new()
   )
 
   function card:ability(board)
-    board.yourHand:changePilePower(1)
+    board.player.hand:changePilePower(1)
   end
     
   return card
@@ -249,7 +251,7 @@ function HadesPrototype:new()
   )
   
   function card:ability(board)
-    board.yourHand:changePilePower(1)
+    board.player.hand:changePilePower(1)
   end
     
   return card
@@ -268,7 +270,13 @@ function HerculesPrototype:new()
   )
   
   function card:ability(board)
-    board.yourHand:changePilePower(1)
+    local pile = board.player.locations[self.pileLocation]
+    for _, card in ipairs(pile) do
+      if card.power > self.power then
+        return
+      end
+    end
+    self.power = self.power * 2
   end
     
   return card
@@ -287,7 +295,7 @@ function DionysusPrototype:new()
   )
 
   function card:ability(board)
-    board.yourHand:changePilePower(1)
+    self.power = self.power + ((board.player.locations[self.pileLocation]:length() - 1) * 2)
   end
     
   return card
@@ -306,7 +314,7 @@ function ApolloPrototype:new()
   )
 
   function card:ability(board)
-    board.yourHand:changePilePower(1)
+    board.player.mana = board.player.mana + 1
   end
     
   return card
@@ -320,13 +328,16 @@ function HephaestusPrototype:new()
     "Hephaestus",
     "When Revealed: Lower the cost of 2 cards in your hand by 1",
     5,
-    12,
+    14,
     love.graphics.newImage("assets/Hephaestus.png"),
     true
   )
   
   function card:ability(board)
-    board.yourHand:changePilePower(1)
+    local cards = board.player.hand:pickRandom(2)
+    for _, card in ipairs(cards) do
+      card.power = card.power - 1 or 0
+    end
   end
     
   return card

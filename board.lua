@@ -175,5 +175,6 @@ function Board:deal(player)
   if card and #player.hand.cards <= 6 then
     player.hand:addCard(card)
     card.pileLocation = PILE_LOCATIONS.HAND
+    card.faceUp = true
   end
 end

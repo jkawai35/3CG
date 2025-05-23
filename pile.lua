@@ -32,8 +32,10 @@ end
 
 function Pile:reveal(board)
   local totalPower = 0
+  self:allFaceDown()  
   for _, card in ipairs(self.cards) do
     totalPower = totalPower + card.power
+    card.faceUp = true
     
     if card.hasAbility then
       card:ability(board)
@@ -112,7 +114,7 @@ function Pile:pickRandom(cards)
   local index = love.math.random(1, #self.cards)
 
   for i = 1, cards do
-    while self:checkDuplicates(picked, self.cards[index].name) do
+    while self:checkDuplicates(picked, index) do
       index = love.math.random(1, #self.cards)
     end
     
@@ -120,4 +122,10 @@ function Pile:pickRandom(cards)
   end
   
   return picked
+end
+
+function Pile:allFaceDown()
+  for _, card in ipairs(self.cards) do
+    card.faceUp = false
+  end
 end

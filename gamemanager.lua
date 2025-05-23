@@ -31,15 +31,20 @@ function GameManager:submitPlay()
     local yourPower = self.board.player.locations[i]:reveal(self.board)
     local oppPower = self.board.opp.locations[i]:reveal(self.board)
     
-    if yourPower > oppPower then
-      playerAddScore = playerAddScore + yourPower - oppPower
-    elseif oppPower > yourPower then
-      oppAddScore = oppAddScore + oppPower - yourPower
+    print("Your power: " .. yourPower)
+    print("Their power: " .. oppPower)
+
+    
+    if yourPower > oppPower and self.board.opp.locations[i]:length() > 0 then
+      playerAddScore = math.abs(playerAddScore + yourPower - oppPower)
+    elseif oppPower > yourPower and self.board.player.locations[i]:length() > 0 then
+      oppAddScore = math.abs(oppAddScore + oppPower - yourPower)
     else
-      if math.random() < 0.5 then
-        playerAddScore = playerAddScore + yourPower - oppPower
+      if math.random() < 0.5 and self.board.opp.locations[i]:length() > 0  and self.board.player.locations[i]:length() > 0 then
+        playerAddScore = math.abs(playerAddScore + yourPower - oppPower)
+      elseif math.random() >= 0.5 and self.board.player.locations[i]:length() > 0 and self.board.opp.locations[i]:length() > 0 then
+        oppAddScore = math.abs(oppAddScore + oppPower - yourPower)
       else
-        oppAddScore = oppAddScore + oppPower - yourPower
       end
     end
   end
@@ -49,6 +54,9 @@ function GameManager:submitPlay()
   
   self.board:deal(self.board.player)
   self.board:deal(self.board.opp)
+  
+  --print("Player score: " .. self.board.player.score)
+  --print("Opp score: " .. self.board.opp.score)
     
 end
 

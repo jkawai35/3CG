@@ -64,11 +64,12 @@ function GrabberClass:mousereleased(x, y, board)
   if not self.heldObject then return end
 
   local snapped = false
-  for _, pile in ipairs(board.player.piles) do
-    if pile:contains(x, y) and pile:length() <= 4 then
+  for i, pile in ipairs(board.player.piles) do
+    if pile:contains(x, y) and pile:length() < 4 then
       if pile:addCard(self.heldObject) then
         snapped = true
-        self.heldObject.pileLocation = pile.location
+        self.heldObject.pileLocation = i
+        self.heldObject.faceUp = false
         break
       end
     end
