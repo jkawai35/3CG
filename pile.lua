@@ -20,9 +20,13 @@ end
 function Pile:draw()
   love.graphics.setColor(1, 1, 1, 1)
   for i, card in ipairs(self.cards) do
-    -- stack cards horizontally with spacing
-    local offsetX = (90) * (i - 1)
-    card:draw(self.position.x + offsetX, self.position.y)
+    -- Stack cards horizontally with spacing
+    if self.location == PILE_LOCATIONS.DISCARD then
+      card:draw(self.position.x, self.position.y)
+    else
+      local offsetX = (90) * (i - 1)
+      card:draw(self.position.x + offsetX, self.position.y)
+    end
   end
 end
 
@@ -32,21 +36,23 @@ end
 
 function Pile:reveal(board)
   local totalPower = 0
-  self:allFaceDown()  
+  self:allFaceDown()
+  
+  -- Add up powers of cards
   for _, card in ipairs(self.cards) do
     totalPower = totalPower + card.power
     card.faceUp = true
     
+    -- Activate ability if the card has one
     if card.hasAbility then
       card:ability(board)
     end
-    
     card.canMove = false
   end
   return totalPower
 end
 
--- NEW: check if a point is within the pile bounds
+-- For checking if card is within the bounds of a pile
 function Pile:contains(x, y)
   return (
     x >= self.position.x and
@@ -100,6 +106,7 @@ function Pile:changePilePower(amount)
 end
 
 function Pile:checkDuplicates(table, value)
+  -- Mainly checking for duplicates in a random card selection
   for _, card in ipairs(self.cards) do
     if card and card.name == value then
       return true

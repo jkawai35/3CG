@@ -1,6 +1,7 @@
 require("vector")
 require("board")
 require("player")
+require("card")
 
 GrabberClass = {}
 io.stdout:setvbuf("no")
@@ -64,17 +65,26 @@ function GrabberClass:mousereleased(x, y, board)
   if not self.heldObject then return end
 
   local snapped = false
+  
+  -- Check for legal placement including mana cost and location capacity
   for i, pile in ipairs(board.player.piles) do
-    if pile:contains(x, y) and pile:length() < 4 then
+    if pile:contains(x, y) and pile:length() < 4 and board.player.mana >= self.heldObject.cost  and pile ~= board.player.hand then
       if pile:addCard(self.heldObject) then
         snapped = true
         self.heldObject.pileLocation = i
         self.heldObject.faceUp = false
+        board.player.mana = board.player.mana - self.heldObject.cost
+        
+        -- Check if apollo ability needs to be accounted for
+        if self.heldObject.name == CARD_NAMES.APOLLO then
+          board.player.apollo = true
+        end 
         break
       end
     end
   end
 
+  -- Return to last position if not logally placed
   if not snapped and self.heldObject.prevPosition then
     self.heldObject.position = Vector(self.heldObject.prevPosition.x, self.heldObject.prevPosition.y)
     
@@ -83,6 +93,7 @@ function GrabberClass:mousereleased(x, y, board)
     end
   end
 
+  -- Reset held card state
   self.heldObject.state = CARD_STATE.IDLE
   self.heldObject = nil
   self.grabPos = nil

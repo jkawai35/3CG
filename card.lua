@@ -5,11 +5,27 @@ CardPrototype = {}
 CARD_STATE = {
   IDLE = 0,
   MOUSE_OVER = 1,
-  GRABBED = 2
+  GRABBED = 2,
+}
+
+CARD_NAMES = {
+  COW = "Wooden Cow",
+  PEGASUS = "Pegasus",
+  MINOTAUR = "Minotaur",
+  TITAN = "Titan",
+  ZEUS = "Zeus",
+  ARES = "Ares",
+  ARTEMIS = "Artemis",
+  HERA = "Hera",
+  DEMETER = "Demeter",
+  HADES = "Hades",
+  HERCULES = "Hercules",
+  DIONYSUS = "Dionysus",
+  APOLLO = "Apollo",
+  HEPHAESTUS = "Heaphaestus"
 }
 
 -- Constructor for basic card prototype
--- TODO: Add text parameter
 function CardPrototype:new(name, text, cost, pow, front, ability)
   local card = {}
   local metadata = {__index = CardPrototype}
@@ -49,10 +65,12 @@ function CardPrototype:flip()
   self.faceUp = not self.faceUp
 end
 
+-- Helper for changing card power
 function CardPrototype:changePower(amount)
   self.power = self.power + amount
 end
 
+-- Check if mouse is over a card
 function CardPrototype:checkForMouseOver(grabber)
   if self.state == CARD_STATE.GRABBED then
     return
@@ -71,6 +89,8 @@ function CardPrototype:checkForMouseOver(grabber)
   else
     self.state = CARD_STATE.IDLE
   end
+  
+  return isMouseOver
 
 end
 
@@ -81,7 +101,7 @@ WoodenCowPrototype = {}
 
 function WoodenCowPrototype:new()
   local card = CardPrototype:new(
-    "Wooden Cow",
+    CARD_NAMES.COW,
     "It's a cow made of wood",
     1,
     1,
@@ -95,7 +115,7 @@ PegasusPrototype = {}
 
 function PegasusPrototype:new()
   local card = CardPrototype:new(
-    "Pegasus",
+    CARD_NAMES.PEGASUS,
     "Faster than you think",
     3,
     5,
@@ -110,7 +130,7 @@ MinotaurPrototype = {}
 
 function MinotaurPrototype:new()
   local card = CardPrototype:new(
-    "Minataur",
+    CARD_NAMES.MINOTAUR,
     "Don't mess with a minotaur",
     5,
     9,
@@ -127,7 +147,7 @@ TitanPrototype = {}
 
 function TitanPrototype:new()
   local card = CardPrototype:new(
-    "Titan",
+    CARD_NAMES.TITAN,
     "A fierce warrior indeed",
     6,
     12,
@@ -142,7 +162,7 @@ ZeusPrototype = {}
 
 function ZeusPrototype:new()
   local card = CardPrototype:new(
-    "Zeus",
+    CARD_NAMES.ZEUS,
     "When revealed: Lower the power of each card in your opponenet's hand by 1",
     12,
     25,
@@ -161,7 +181,7 @@ AresPrototype = {}
 
 function AresPrototype:new()
   local card = CardPrototype:new(
-    "Ares",
+    CARD_NAMES.ARES,
     "When Revealed: Gain +2 power for each enemy card here",
     9,
     14,
@@ -181,7 +201,7 @@ ArtemisPrototype = {}
 
 function ArtemisPrototype:new()
   local card = CardPrototype:new(
-    "Artemis",
+    CARD_NAMES.ARTEMIS,
     "When Revealed: Gain +5 power if there is exactly one enemy card here",
     8,
     12,
@@ -202,7 +222,7 @@ HeraPrototype = {}
 
 function HeraPrototype:new()
   local card = CardPrototype:new(
-    "Hera",
+    CARD_NAMES.HERA,
     "When Revealed: Give cards in your hand +1 power",
     9,
     16,
@@ -221,7 +241,7 @@ DemeterPrototype = {}
 
 function DemeterPrototype:new()
   local card = CardPrototype:new(
-    "Demeter",
+    CARD_NAMES.DEMETER,
     "When Revealed: Both players draw a card",
     5,
     14,
@@ -230,9 +250,8 @@ function DemeterPrototype:new()
   )
   
   function card:ability(board)
-    print("here")
-    board:deal(board.player)
-    board:deal(board.opp)
+    board:deal(board.player, PLAYER_ENUM.PLAYER)
+    board:deal(board.opp, PLAYER_ENUM.OPP)
   end
     
   return card
@@ -242,7 +261,7 @@ HadesPrototype = {}
 
 function HadesPrototype:new()
   local card = CardPrototype:new(
-    "Hades",
+    CARD_NAMES.HADES,
     "When Revealed: Gain +2 power for each card in your discard pile",
     9,
     12,
@@ -251,7 +270,7 @@ function HadesPrototype:new()
   )
   
   function card:ability(board)
-    board.player.hand:changePilePower(1)
+    self.power = self.power + (board.player.discard:length() * 2)
   end
     
   return card
@@ -261,7 +280,7 @@ HerculesPrototype = {}
 
 function HerculesPrototype:new()
   local card = CardPrototype:new(
-    "Hercules",
+    CARD_NAMES.HERCULES,
     "When Revealed: Doubles its power if its the strongest card here",
     10,
     12,
@@ -286,7 +305,7 @@ DionysusPrototype = {}
 
 function DionysusPrototype:new()
   local card = CardPrototype:new(
-    "Dionysus",
+    CARD_NAMES.DIONYSUS,
     "When Revealed: Gain +2 power for each of your other cards here.",
     8,
     14,
@@ -305,7 +324,7 @@ ApolloPrototype = {}
 
 function ApolloPrototype:new()
   local card = CardPrototype:new(
-    "Apollo",
+    CARD_NAMES.APOLLO,
     "When Revealed: Gain +1 mana next turn",
     7,
     14,
@@ -325,9 +344,9 @@ HephaestusPrototype = {}
 
 function HephaestusPrototype:new()
   local card = CardPrototype:new(
-    "Hephaestus",
+    CARD_NAMES.HEPHAESTUS,
     "When Revealed: Lower the cost of 2 cards in your hand by 1",
-    5,
+    7,
     14,
     love.graphics.newImage("assets/Hephaestus.png"),
     true

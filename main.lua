@@ -4,7 +4,7 @@ require("grabber")
 require("gamemanager")
 
 function love.load()
-  love.window.setTitle("3CG")
+  love.window.setTitle("Myth Madness")
   love.window.setMode(1200, 800)
   
   deck1 = Deck:new()
@@ -13,21 +13,23 @@ function love.load()
   deck2:shuffle()
   
   board = Board:new(deck1, deck2)
-  
-  gameManager = GameManager:new(board)
-  
+    
   grabber = GrabberClass:new()
+  
+  gameManager = GameManager:new(board, grabber)
 
 end
 
 function love.update(dt)
   grabber:update()
   board:update(grabber)
+  gameManager:update()
 end
 
 
 function love.draw()
   board:draw(grabber)
+  gameManager:draw()
 
 end
 
