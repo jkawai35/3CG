@@ -250,8 +250,8 @@ function DemeterPrototype:new()
   )
   
   function card:ability(board)
-    board:deal(board.player, PLAYER_ENUM.PLAYER)
-    board:deal(board.opp, PLAYER_ENUM.OPP)
+    board:deal(board.player, PLAYER_NAME.PLAYER)
+    board:deal(board.opp, PLAYER_NAME.OPP)
   end
     
   return card

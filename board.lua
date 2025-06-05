@@ -15,9 +15,9 @@ PILE_LOCATIONS = {
   DISCARD = 5
 }
 
-PLAYER_ENUM = {
-  PLAYER = 0,
-  OPP = 1
+PLAYER_NAME = {
+  PLAYER = "Player",
+  OPP = "Opponent"
 }
 
 function Board:new(deck1, deck2)
@@ -30,12 +30,28 @@ function Board:new(deck1, deck2)
   
   board.allPiles = {}
   
-  board.submitButton = {
+  board.revealButton = {
   position = Vector(love.graphics.getWidth() / 2 - 100, love.graphics.getHeight() / 2 - 20),
   width = 200,
   height = 50,
-  text = "Submit Play",
-  visible = true
+  text = "Reveal",
+  visible = false
+  }
+
+  board.oppButton = {
+    position = Vector(love.graphics.getWidth() / 2 - 100, love.graphics.getHeight() / 2 - 20),
+    width = 200,
+    height = 50,
+    text = "Opp Turn",
+    visible = true
+  }
+  
+  board.calcButton = {
+    position = Vector(love.graphics.getWidth() / 2 - 100, love.graphics.getHeight() / 2 - 20),
+    width = 200,
+    height = 50,
+    text = "Calculate",
+    visible = true
   }
 
   board.addManaP = false
@@ -94,8 +110,8 @@ function Board:new(deck1, deck2)
   
   -- Deal 3 cards to your hand
   for i = 1, 3 do
-    board:deal(board.player, PLAYER_ENUM.PLAYER)
-    board:deal(board.opp, PLAYER_ENUM.OPP)
+    board:deal(board.player, PLAYER_NAME.PLAYER)
+    board:deal(board.opp, PLAYER_NAME.OPP)
   end
   
   return board
@@ -151,11 +167,21 @@ function Board:draw()
   -- Reset color
   love.graphics.setColor(1, 1, 1, 1)
   
-  if self.submitButton.visible then
+  if self.revealButton.visible then
     love.graphics.setColor(0.2, 0.6, 1)
-    love.graphics.rectangle("fill", self.submitButton.position.x, self.submitButton.position.y, self.submitButton.width, self.submitButton.height)
+    love.graphics.rectangle("fill", self.revealButton.position.x, self.revealButton.position.y, self.revealButton.width, self.revealButton.height)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.printf(self.submitButton.text, self.submitButton.position.x, self.submitButton.position.y + 15, self.submitButton.width, "center")
+    love.graphics.printf(self.revealButton.text, self.revealButton.position.x, self.revealButton.position.y + 15, self.revealButton.width, "center")
+  elseif self.oppButton.visible then
+    love.graphics.setColor(0.2, 0.6, 1)
+    love.graphics.rectangle("fill", self.oppButton.position.x, self.oppButton.position.y, self.oppButton.width, self.oppButton.height)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf(self.oppButton.text, self.oppButton.position.x, self.oppButton.position.y + 15, self.oppButton.width, "center")
+  else
+    love.graphics.setColor(0.2, 0.6, 1)
+    love.graphics.rectangle("fill", self.calcButton.position.x, self.calcButton.position.y, self.calcButton.width, self.calcButton.height)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf(self.calcButton.text, self.calcButton.position.x, self.calcButton.position.y + 15, self.calcButton.width, "center")
   end
   
   self:drawPlayerStats()
@@ -179,12 +205,29 @@ function Board:draw()
 end
 
 function Board:mousepressed(x, y, button, gameManager, grabber)  
-  local b = self.submitButton
+  local r = self.revealButton
+  local o = self.oppButton
+  local c = self.calcButton
   
   -- Check if button is clicked and then call game manager
-  if b.visible and button == 1 and x > b.position.x and x < b.position.x + b.width and y > b.position.y and y < b.position.y + b.height then
+  if r.visible and button == 1 and x > r.position.x and x < r.position.x + r.width and y > r.position.y and y < r.position.y + r.height then
     gameManager:submitPlay()
+    r.visible = false
+    o.visible = false
+    c.visible = true
     return
+  elseif o.visible and button == 1 and x > o.position.x and x < o.position.x + o.width and y > o.position.y and y < o.position.y + o.height then
+    gameManager:submitPlay()
+    o.visible = false
+    r.visible = true
+    c.visible = false
+    return 
+  elseif c.visible and button == 1 and x > c.position.x and x < c.position.x + c.width and y > c.position.y and y < c.position.y + c.height then
+    gameManager:submitPlay()
+    o.visible = true
+    r.visible = false
+    c.visible = false
+    return 
   end
 
   -- Otherwise forward to grabber logic
@@ -199,7 +242,7 @@ function Board:deal(player, name)
     player.hand:addCard(card)
     card.pileLocation = PILE_LOCATIONS.HAND
     
-    if name == PLAYER_ENUM.OPP then
+    if name == PLAYER_NAME.OPP then
       card.faceUp = false
     end
   end

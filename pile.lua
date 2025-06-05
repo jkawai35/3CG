@@ -1,7 +1,7 @@
 require("card")
 
 Pile = {}
-Pile.__index = Pile  -- If you meant to use Pile here, fix this line to: Pile.__index = Pile
+Pile.__index = Pile
 
 function Pile:new(x, y, location, board)
   local pile = {}
@@ -9,7 +9,7 @@ function Pile:new(x, y, location, board)
 
   pile.cards = {}
   pile.position = Vector(x or 0, y or 0)
-  pile.width = (80 + 10) * 4 - 10 -- assuming 4 cards max with 10px spacing
+  pile.width = (80 + 10) * 4 - 10
   pile.height = 115
   pile.location = location
   pile.board = board
@@ -34,14 +34,18 @@ function Pile:length()
   return #self.cards
 end
 
+function Pile:faceUpCards()
+  for _, card in ipairs(self.cards) do
+    card.faceUp = true
+  end
+end
+
 function Pile:reveal(board)
   local totalPower = 0
-  self:allFaceDown()
   
   -- Add up powers of cards
   for _, card in ipairs(self.cards) do
     totalPower = totalPower + card.power
-    card.faceUp = true
     
     -- Activate ability if the card has one
     if card.hasAbility then
@@ -71,7 +75,7 @@ function Pile:addCard(card)
   -- Add to this pile
   table.insert(self.cards, card)
   card.position = Vector(self:getCardPosition(#self.cards))
-  card.currentPile = self -- 🔹 Set this as the current pile
+  card.currentPile = self
   card.prevPile = self
 
   return true

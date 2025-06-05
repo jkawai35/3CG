@@ -36,7 +36,7 @@ function GrabberClass:mousepressed(x, y, board)
 
   for _, pile in ipairs(board.player.piles) do
     for _, card in ipairs(pile.cards) do
-      if card.state == CARD_STATE.MOUSE_OVER and card.canMove then
+      if card.state == CARD_STATE.MOUSE_OVER and card.canMove and gameManager.phase == GAME_PHASE.STAGING then
         self.heldObject = card
         card.prevPosition = Vector(card.position.x, card.position.y)
         card.prevPile = card.currentPile
