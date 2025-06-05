@@ -140,3 +140,36 @@ function Pile:allFaceDown()
     card.faceUp = false
   end
 end
+
+
+-- Start flipping
+function Pile:startFlipping(delay)
+  self.flipping = {
+    index = 1,
+    timer = 0,
+    delay = delay or 0.3,
+    active = true
+  }
+end
+
+function Pile:update(dt)
+  if self.flipping and self.flipping.active then
+    self.flipping.timer = self.flipping.timer + dt
+    if self.flipping.timer >= self.flipping.delay then
+      local i = self.flipping.index
+      if self.cards[i] then
+        self.cards[i].faceUp = true
+        self.flipping.index = i + 1
+        self.flipping.timer = 0
+      else
+        self.flipping.active = false
+      end
+    end
+  end
+end
+
+function Pile:isFlipping()
+  return self.flipping and self.flipping.active
+end
+
+

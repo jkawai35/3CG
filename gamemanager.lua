@@ -87,10 +87,20 @@ function GameManager:submitPlay()
     self.phase = GAME_PHASE.REVEAL
   elseif self.phase == GAME_PHASE.REVEAL then
     for i = 1, 3 do
+      self.board.player.locations[i]:startFlipping(0.2)
+      self.board.opp.locations[i]:startFlipping(0.2)
+      
+      self.phase = GAME_PHASE.RESOLUTION
+
+    end
+    --[[
+    for i = 1, 3 do
       self.board.player.locations[i]:faceUpCards()
       self.board.opp.locations[i]:faceUpCards()
+      
       self.phase = GAME_PHASE.RESOLUTION
     end
+    --]]
   else
     for i = 1, 3 do
       local yourPower = self.board.player.locations[i]:reveal(self.board)
