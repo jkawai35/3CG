@@ -30,28 +30,38 @@ function Pile:draw()
   end
 end
 
+-- Return length of pile
 function Pile:length()
   return #self.cards
 end
 
+-- Face all cards up
 function Pile:faceUpCards()
   for _, card in ipairs(self.cards) do
     card.faceUp = true
   end
 end
 
+-- Checking abilities
 function Pile:reveal(board)
-  local totalPower = 0
-  
   -- Add up powers of cards
   for _, card in ipairs(self.cards) do
-    totalPower = totalPower + card.power
     
     -- Activate ability if the card has one
-    if card.hasAbility then
+    if card.hasAbility and not card.abilityUsed then
       card:ability(board)
+      card.abilityUsed = true
     end
     card.canMove = false
+  end
+end
+
+-- Return total power of pile
+function Pile:power(board)
+  local totalPower = 0
+    -- Add up powers of cards
+  for _, card in ipairs(self.cards) do
+    totalPower = totalPower + card.power
   end
   return totalPower
 end
@@ -97,18 +107,20 @@ function Pile:removeCard(card)
   end
 end
 
-
+-- Return position of a card
 function Pile:getCardPosition(index)
   local spacing = 90
   return self.position.x + (index - 1) * spacing, self.position.y
 end
 
+-- Change the power of a pile
 function Pile:changePilePower(amount)
   for _, card in ipairs(self.cards) do
     card:changePower(amount)
   end
 end
 
+-- Check if duplicates in a pile
 function Pile:checkDuplicates(table, value)
   -- Mainly checking for duplicates in a random card selection
   for _, card in ipairs(self.cards) do
@@ -120,6 +132,7 @@ function Pile:checkDuplicates(table, value)
   end
 end
 
+-- Picks (cards) cards at random from pile
 function Pile:pickRandom(cards)
   local picked = {}
   local index = love.math.random(1, #self.cards)
@@ -135,41 +148,11 @@ function Pile:pickRandom(cards)
   return picked
 end
 
+-- Faces all cards down
 function Pile:allFaceDown()
   for _, card in ipairs(self.cards) do
     card.faceUp = false
   end
-end
-
-
--- Start flipping
-function Pile:startFlipping(delay)
-  self.flipping = {
-    index = 1,
-    timer = 0,
-    delay = delay or 0.3,
-    active = true
-  }
-end
-
-function Pile:update(dt)
-  if self.flipping and self.flipping.active then
-    self.flipping.timer = self.flipping.timer + dt
-    if self.flipping.timer >= self.flipping.delay then
-      local i = self.flipping.index
-      if self.cards[i] then
-        self.cards[i].faceUp = true
-        self.flipping.index = i + 1
-        self.flipping.timer = 0
-      else
-        self.flipping.active = false
-      end
-    end
-  end
-end
-
-function Pile:isFlipping()
-  return self.flipping and self.flipping.active
 end
 
 

@@ -54,6 +54,7 @@ function Player:takeTurn(board)
     card.pileLocation = locationIndex
     self.mana = self.mana - card.cost
     card.faceUp = false
+    table.insert(board.flippingPile, card)
     
     if (card.name == CARD_NAMES.APOLLO) then
       self.apollo = true

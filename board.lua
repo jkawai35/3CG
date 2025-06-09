@@ -29,6 +29,7 @@ function Board:new(deck1, deck2)
   board.opp = Player:new(deck2)
   
   board.allPiles = {}
+  board.flippingPile = {}
   
   board.revealButton = {
   position = Vector(love.graphics.getWidth() / 2 - 100, love.graphics.getHeight() / 2 - 20),
@@ -118,10 +119,23 @@ function Board:new(deck1, deck2)
 end
 
 
-function Board:update(grabber)
+function Board:update(dt, grabber)
   for _, pile in ipairs(self.player.piles) do
     for _, card in ipairs(pile.cards) do
       card:checkForMouseOver(grabber)
+    end
+  end
+  
+  if self.flipping and self.flipping.active then
+    self.flipping.timer = self.flipping.timer + dt
+    if self.flipping.timer >= self.flipping.delay then
+      local nextCard = table.remove(self.flippingPile, 1)
+      if nextCard then
+        nextCard.faceUp = true
+        self.flipping.timer = 0
+      else
+        self.flipping.active = false
+      end
     end
   end
 end
@@ -173,12 +187,12 @@ function Board:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf(self.revealButton.text, self.revealButton.position.x, self.revealButton.position.y + 15, self.revealButton.width, "center")
   elseif self.oppButton.visible then
-    love.graphics.setColor(0.2, 0.6, 1)
+    love.graphics.setColor(1.0, 0.4, 0.2)
     love.graphics.rectangle("fill", self.oppButton.position.x, self.oppButton.position.y, self.oppButton.width, self.oppButton.height)
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf(self.oppButton.text, self.oppButton.position.x, self.oppButton.position.y + 15, self.oppButton.width, "center")
   else
-    love.graphics.setColor(0.2, 0.6, 1)
+    love.graphics.setColor(0.5, 0.9, .4)
     love.graphics.rectangle("fill", self.calcButton.position.x, self.calcButton.position.y, self.calcButton.width, self.calcButton.height)
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf(self.calcButton.text, self.calcButton.position.x, self.calcButton.position.y + 15, self.calcButton.width, "center")
@@ -294,5 +308,19 @@ function Board:drawDeck()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(cardBackImage, x, y)
   end
+end
+
+-- Start flipping
+function Board:startFlipping(delay)
+  self.flipping = {
+    index = 1,
+    timer = 0,
+    delay = delay,
+    active = true
+  }
+end
+
+function Board:isFlipping()
+  return self.flipping and self.flipping.active
 end
 

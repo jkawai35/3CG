@@ -5,7 +5,6 @@ Deck.__index = Deck
 
 io.stdout:setvbuf("no")
 
-
 -- Deck constructor for create a new deck object
 function Deck:new()
   local deck = {}

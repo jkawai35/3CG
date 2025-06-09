@@ -25,25 +25,9 @@ end
 function love.update(dt)
   if gameState == GAME_STATE.PLAYING then
     grabber:update()
-    board:update(grabber)
+    board:update(dt, grabber)
     gameManager:update()
   end
-  
-  for i = 1, 3 do
-    gameManager.board.player.locations[i]:update(dt)
-    gameManager.board.opp.locations[i]:update(dt)
-  end
-
-  if gameManager.phase == GAME_PHASE.REVEAL then
-    local allDone = true
-    for i = 1, 3 do
-      if gameManager.board.player.locations[i]:isFlipping() or gameManager.board.opp.locations[i]:isFlipping() then
-        allDone = false
-        break
-      end
-    end
-  end
-
 end
 
 

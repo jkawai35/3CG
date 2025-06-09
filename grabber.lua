@@ -74,6 +74,7 @@ function GrabberClass:mousereleased(x, y, board)
         self.heldObject.pileLocation = i
         self.heldObject.faceUp = false
         board.player.mana = board.player.mana - self.heldObject.cost
+        table.insert(board.flippingPile, self.heldObject)
         
         -- Check if apollo ability needs to be accounted for
         if self.heldObject.name == CARD_NAMES.APOLLO then

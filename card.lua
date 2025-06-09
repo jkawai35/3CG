@@ -25,6 +25,8 @@ CARD_NAMES = {
   HEPHAESTUS = "Heaphaestus"
 }
 
+local backImage = love.graphics.newImage("assets/Back.png")
+
 -- Constructor for basic card prototype
 function CardPrototype:new(name, text, cost, pow, front, ability)
   local card = {}
@@ -36,7 +38,7 @@ function CardPrototype:new(name, text, cost, pow, front, ability)
   card.power = pow
   card.cost = cost
   card.frontImage = front
-  card.backImage = love.graphics.newImage("assets/Back.png")
+  card.backImage = backImage
   card.faceUp = true
   card.position = Vector(0, 0)
   card.state = CARD_STATE.IDLE
@@ -46,6 +48,7 @@ function CardPrototype:new(name, text, cost, pow, front, ability)
   card.pileLocation = nil
   card.canMove = true
   card.hasAbility = ability
+  card.abilityUsed = false
   
   return card
 end
